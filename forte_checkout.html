@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Forte Checkout Sandbox Test</title>
+  <script src="https://sandbox.forte.net/checkout/v2/js"></script>
+  <script>
+    function openForteCheckoutSandbox() {
+      // Wait until ForteCheckout is defined
+      if (typeof ForteCheckout === 'undefined') {
+        setTimeout(openForteCheckoutSandbox, 100);
+        return;
+      }
+      ForteCheckout.open({
+        api_access_id: "3a3666ba616b466c3b9339da0c01d2cf", // Your Access ID
+        signature: "PASTE_YOUR_SIGNATURE_HERE", // Paste the generated signature here
+        method: "sale",
+        version_number: "2.0",
+        location_id: "400842",
+        organization_id: "499208",
+        utc_time: "638887595035150000", // Paste the UTC ticks from Forte sandbox getUTC
+        total_amount: "10.00",
+        order_number: "TESTORDER123",
+        allowed_methods: "visa,mast,disc,amex,echeck", // Added allowed_methods
+        callback: "onForteCallback",
+        hash_method: "sha256"
+      });
+    }
+    function onForteCallback(e) {
+      alert(JSON.stringify(e.data || e));
+    }
+  </script>
+</head>
+<body onload="openForteCheckoutSandbox()">
+  <h3>Loading payment...</h3>
+  <!--
+    Sandbox Testing Instructions:
+    1. Generate the signature using your Secure Key and the correct string to sign.
+    2. Get UTC ticks from https://sandbox.forte.net/checkout/getUTC?callback=?
+    3. Paste both values above and reload this file in your WebView or browser.
+  -->
+</body>
+</html> 
