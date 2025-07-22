@@ -8,8 +8,8 @@
   <script>
     // WARNING: Never expose your Secure Key in production! This is for sandbox/testing only.
     function generateSignature() {
-      var api_secure_key = "PASTE_YOUR_SANDBOX_SECURE_KEY_HERE"; // <-- PASTE YOUR SANDBOX SECURE KEY HERE
-      var string_to_sign = "3a3666ba616b466c3b9339da0c01d2cf|sale|2.0|10.00|638887620541180000|TESTORDER123||";
+      var api_secure_key = "d09d645c5a441cb7207882412085a324";
+      var string_to_sign = "3a3666ba616b466c3b9339da0c01d2cf|sale|2.0|10.00|638887631917920000|TESTORDER123||";
       var signature = CryptoJS.HmacSHA256(string_to_sign, api_secure_key).toString(CryptoJS.enc.Hex);
       return signature;
     }
@@ -25,7 +25,7 @@
         version_number: "2.0",
         location_id: "400842",
         organization_id: "499208",
-        utc_time: "638887620541180000",
+        utc_time: "638887631917920000",
         total_amount: "10.00",
         order_number: "TESTORDER123",
         allowed_methods: "visa,mast,disc,amex,echeck",
