@@ -8,7 +8,7 @@
   <script>
     // WARNING: Never expose your Secure Key in production! This is for sandbox/testing only.
     function generateSignature() {
-      var api_secure_key = "d09d645c5a441cb7207882412085a324";
+      var api_secure_key = "59383be0025b296feff007703e037b54";
       var string_to_sign = "3a3666ba616b466c3b9339da0c01d2cf|sale|2.0|10.00|638887631917920000|TESTORDER123||";
       var signature = CryptoJS.HmacSHA256(string_to_sign, api_secure_key).toString(CryptoJS.enc.Hex);
       return signature;
