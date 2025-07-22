@@ -7,44 +7,81 @@
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <!-- 2. Load Forte Checkout script AFTER jQuery -->
   <script src="https://sandbox.forte.net/checkout/v2/js"></script>
-  <!-- 3. Load CryptoJS (if you need to generate signatures in JS) -->
+  <!-- 3. Load CryptoJS for HMAC SHA256 -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
   <script>
     // WARNING: Never expose your Secure Key in production! This is for sandbox/testing only.
-    function generateSignature() {
-      var api_secure_key = "852d14b8761f2e6e88e42e72e6e353bd";
-      var string_to_sign = "419c0fd038799f51c3b714ad0f4e60f6|sale|2.0|10.00|638887631917920000|TESTORDER123||";
-      var signature = CryptoJS.HmacSHA256(string_to_sign, api_secure_key).toString(CryptoJS.enc.Hex);
-      return signature;
+    const apiAccessId = '419c0fd038799f51c3b714ad0f4e60f6';
+    const secureApiKey = '852d14b8761f2e6e88e42e72e6e353bd';
+    const organizationId = '498415';
+    const locationId = '399718';
+    const amount = '101.00';
+
+    function onForteCallback(e) {
+      try {
+        const data = e.data || e;
+        alert("Forte Callback: " + JSON.stringify(data));
+        if (data.response_code === "A01") {
+          alert("Payment successful! Amount: " + data.total_amount);
+        } else {
+          alert("Payment failed: " + (data.response_text || data.response_description));
+        }
+      } catch (err) {
+        alert('Callback parsing error: ' + err);
+      }
     }
-    function openForteCheckoutSandbox() {
-      alert("Function called!");
+
+    function openForteCheckoutSandbox(params) {
       if (typeof ForteCheckout === 'undefined') {
-        alert("ForteCheckout not loaded yet!");
-        setTimeout(openForteCheckoutSandbox, 100);
+        setTimeout(() => openForteCheckoutSandbox(params), 100);
         return;
       }
-      alert("ForteCheckout loaded, opening modal...");
       ForteCheckout.open({
-        api_access_id: "419c0fd038799f51c3b714ad0f4e60f6",
-        signature: generateSignature(),
+        api_access_id: params.apiAccessId,
+        signature: params.signature,
         method: "sale",
         version_number: "2.0",
-        location_id: "399718",
-        organization_id: "498415",
-        utc_time: "638887631917920000",
-        total_amount: "10.00",
-        order_number: "TESTORDER123",
+        location_id: params.locationId,
+        organization_id: params.organizationId,
+        utc_time: params.utcTime,
+        total_amount: params.amount,
+        order_number: params.orderNumber,
         allowed_methods: "visa,mast,disc,amex,echeck",
         callback: "onForteCallback",
         hash_method: "sha256"
       });
     }
-    function onForteCallback(e) {
-      alert(JSON.stringify(e.data || e));
+
+    function fetchUtcTimeAndOpenModal() {
+      // JSONP for Forte UTC time
+      const script = document.createElement('script');
+      script.src = 'https://sandbox.forte.net/checkout/getUTC?callback=onUtcTimeReceived';
+      document.body.appendChild(script);
     }
-    // Call the function after all scripts are loaded
-    window.onload = openForteCheckoutSandbox;
+
+    function onUtcTimeReceived(utc) {
+      const utcTime = utc;
+      const orderNumber = `INV-${utcTime}`;
+      const stringToSign = `${apiAccessId}|sale|2.0|${amount}|${utcTime}|${orderNumber}||`;
+      const hash = CryptoJS.HmacSHA256(stringToSign, secureApiKey);
+      const signature = hash.toString(CryptoJS.enc.Hex);
+
+      // Expose callback globally for Forte
+      window.onForteCallback = onForteCallback;
+
+      // Open the modal
+      openForteCheckoutSandbox({
+        apiAccessId,
+        signature,
+        locationId,
+        organizationId,
+        utcTime,
+        amount,
+        orderNumber
+      });
+    }
+
+    window.onload = fetchUtcTimeAndOpenModal;
   </script>
 </head>
 <body>
