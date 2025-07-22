@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <title>Forte Checkout Sandbox Test</title>
-  <script src="https://sandbox.forte.net/checkout/v2/js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
   <script>
     // WARNING: Never expose your Secure Key in production! This is for sandbox/testing only.
@@ -39,9 +38,19 @@
     function onForteCallback(e) {
       alert(JSON.stringify(e.data || e));
     }
+    // Dynamically load Forte JS and call openForteCheckoutSandbox after it loads
+    function loadForteAndOpen() {
+      var forteScript = document.createElement('script');
+      forteScript.src = "https://sandbox.forte.net/checkout/v2/js";
+      forteScript.onload = function() {
+        openForteCheckoutSandbox();
+      };
+      document.head.appendChild(forteScript);
+    }
+    window.onload = loadForteAndOpen;
   </script>
 </head>
-<body onload="openForteCheckoutSandbox()">
+<body>
   <h3>Loading payment...</h3>
   <!--
     Sandbox Testing Instructions:
