@@ -3,6 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <title>Forte Checkout Sandbox Test</title>
+  <!-- 1. Load jQuery FIRST -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <!-- 2. Load Forte Checkout script AFTER jQuery -->
+  <script src="https://sandbox.forte.net/checkout/v2/js"></script>
+  <!-- 3. Load CryptoJS (if you need to generate signatures in JS) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
   <script>
     // WARNING: Never expose your Secure Key in production! This is for sandbox/testing only.
@@ -38,25 +43,11 @@
     function onForteCallback(e) {
       alert(JSON.stringify(e.data || e));
     }
-    // Dynamically load Forte JS and call openForteCheckoutSandbox after it loads
-    function loadForteAndOpen() {
-      var forteScript = document.createElement('script');
-      forteScript.src = "https://sandbox.forte.net/checkout/v2/js";
-      forteScript.onload = function() {
-        openForteCheckoutSandbox();
-      };
-      document.head.appendChild(forteScript);
-    }
-    window.onload = loadForteAndOpen;
+    // Call the function after all scripts are loaded
+    window.onload = openForteCheckoutSandbox;
   </script>
 </head>
 <body>
   <h3>Loading payment...</h3>
-  <!--
-    Sandbox Testing Instructions:
-    1. Generate the signature using your Secure Key and the correct string to sign.
-    2. Get UTC ticks from https://sandbox.forte.net/checkout/getUTC?callback=?
-    3. Paste both values above and reload this file in your WebView or browser.
-  -->
 </body>
-</html> 
+</html>
