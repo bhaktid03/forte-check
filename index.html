@@ -14,10 +14,13 @@
       return signature;
     }
     function openForteCheckoutSandbox() {
+      alert("Function called!");
       if (typeof ForteCheckout === 'undefined') {
+        alert("ForteCheckout not loaded yet!");
         setTimeout(openForteCheckoutSandbox, 100);
         return;
       }
+      alert("ForteCheckout loaded, opening modal...");
       ForteCheckout.open({
         api_access_id: "3a3666ba616b466c3b9339da0c01d2cf",
         signature: generateSignature(),
@@ -41,9 +44,10 @@
 <body onload="openForteCheckoutSandbox()">
   <h3>Loading payment...</h3>
   <!--
-    WARNING: Never expose your Secure Key in production! This is for sandbox/testing only.
-    1. Paste your sandbox Secure Key above.
-    2. The signature will be generated in the browser for testing.
+    Sandbox Testing Instructions:
+    1. Generate the signature using your Secure Key and the correct string to sign.
+    2. Get UTC ticks from https://sandbox.forte.net/checkout/getUTC?callback=?
+    3. Paste both values above and reload this file in your WebView or browser.
   -->
 </body>
 </html> 
