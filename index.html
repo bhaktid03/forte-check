@@ -17,6 +17,11 @@
     const locationId = '399718';
     const amount = '101.00';
 
+    let orderNumber = '';
+    let utcTime = '';
+    let signature = '';
+    let loaded = false;
+
     function onForteCallback(e) {
       try {
         const data = e.data || e;
@@ -31,28 +36,53 @@
       }
     }
 
-    function openForteCheckoutSandbox(params) {
+    function openForteCheckoutModal() {
       if (typeof ForteCheckout === 'undefined') {
-        setTimeout(() => openForteCheckoutSandbox(params), 100);
+        setTimeout(openForteCheckoutModal, 100);
         return;
       }
       ForteCheckout.open({
-        api_access_id: params.apiAccessId,
-        signature: params.signature,
+        api_access_id: apiAccessId,
+        signature: signature,
         method: "sale",
         version_number: "2.0",
-        location_id: params.locationId,
-        organization_id: params.organizationId,
-        utc_time: params.utcTime,
-        total_amount: params.amount,
-        order_number: params.orderNumber,
-        allowed_methods: "visa,mast,disc,amex,echeck",
+        location_id: locationId,
+        organization_id: organizationId,
+        utc_time: utcTime,
+        total_amount: amount,
+        order_number: orderNumber,
+        allowed_methods: "visa",
         callback: "onForteCallback",
         hash_method: "sha256"
       });
     }
 
-    function fetchUtcTimeAndOpenModal() {
+    function showPayButton() {
+      loaded = true;
+      document.getElementById('loading-msg').style.display = 'none';
+
+      // Create the button
+      const btn = document.createElement('button');
+      btn.innerText = 'Pay Now';
+      btn.onclick = openForteCheckoutModal;
+      btn.setAttribute('data-forte-checkout-button', '');
+      btn.setAttribute('api_access_id', apiAccessId);
+      btn.setAttribute('method', 'sale');
+      btn.setAttribute('version_number', '2.0');
+      btn.setAttribute('organization_id', organizationId);
+      btn.setAttribute('location_id', locationId);
+      btn.setAttribute('total_amount', amount);
+      btn.setAttribute('order_number', orderNumber);
+      btn.setAttribute('utc_time', utcTime);
+      btn.setAttribute('signature', signature);
+      btn.setAttribute('hash_method', 'sha256');
+      btn.setAttribute('allowed_methods', 'visa');
+      btn.setAttribute('callback', 'onForteCallback');
+
+      document.getElementById('pay-btn-container').appendChild(btn);
+    }
+
+    function fetchUtcTimeAndPrepare() {
       // JSONP for Forte UTC time
       const script = document.createElement('script');
       script.src = 'https://sandbox.forte.net/checkout/getUTC?callback=onUtcTimeReceived';
@@ -60,31 +90,24 @@
     }
 
     function onUtcTimeReceived(utc) {
-      const utcTime = utc;
-      const orderNumber = `INV-${utcTime}`;
+      utcTime = utc;
+      orderNumber = `INV-${utcTime}`;
       const stringToSign = `${apiAccessId}|sale|2.0|${amount}|${utcTime}|${orderNumber}||`;
       const hash = CryptoJS.HmacSHA256(stringToSign, secureApiKey);
-      const signature = hash.toString(CryptoJS.enc.Hex);
+      signature = hash.toString(CryptoJS.enc.Hex);
 
       // Expose callback globally for Forte
       window.onForteCallback = onForteCallback;
 
-      // Open the modal
-      openForteCheckoutSandbox({
-        apiAccessId,
-        signature,
-        locationId,
-        organizationId,
-        utcTime,
-        amount,
-        orderNumber
-      });
+      // Show the pay button
+      showPayButton();
     }
 
-    window.onload = fetchUtcTimeAndOpenModal;
+    window.onload = fetchUtcTimeAndPrepare;
   </script>
 </head>
 <body>
-  <h3>Loading payment...</h3>
+  <h3 id="loading-msg">Loading payment configuration...</h3>
+  <div id="pay-btn-container"></div>
 </body>
 </html>
