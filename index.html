@@ -12,7 +12,7 @@
   <script>
     // WARNING: Never expose your Secure Key in production! This is for sandbox/testing only.
     function generateSignature() {
-      var api_secure_key = "59383be0025b296feff007703e037b54";
+      var api_secure_key = "561f1e420920c513232c5ea1d83118bc";
       var string_to_sign = "3a3666ba616b466c3b9339da0c01d2cf|sale|2.0|10.00|638887631917920000|TESTORDER123||";
       var signature = CryptoJS.HmacSHA256(string_to_sign, api_secure_key).toString(CryptoJS.enc.Hex);
       return signature;
@@ -26,12 +26,12 @@
       }
       alert("ForteCheckout loaded, opening modal...");
       ForteCheckout.open({
-        api_access_id: "3a3666ba616b466c3b9339da0c01d2cf",
+        api_access_id: "419c0fd038799f51c3b714ad0f4e60f6",
         signature: generateSignature(),
         method: "sale",
         version_number: "2.0",
-        location_id: "400842",
-        organization_id: "499208",
+        location_id: "399718",
+        organization_id: "498415",
         utc_time: "638887631917920000",
         total_amount: "10.00",
         order_number: "TESTORDER123",
